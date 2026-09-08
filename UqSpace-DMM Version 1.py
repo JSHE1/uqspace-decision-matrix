@@ -1,5 +1,7 @@
 #file: UqSpace-DMM
 #purpose: Automates the Refined DMM
+#Version 1: Backend Calculations
+#Version 1: AHP calculations, TOPSIS calculations
 #last edited: 01/09/2026
 #editor: Jamie
 
@@ -7,6 +9,22 @@ import numpy as np
 #initialise a global variable CR
 #sets default CR = 0, allows for 0 CR to be provided
 threshold = 0
+
+#function: normalise_matrix
+#param: matrix, Matrix containing criteria and criterion
+#param: weights , integer
+#return: weighted, normalised values.
+def normalise_matrix(matrix, weights):
+    matrix = np.array(matrix, dtype = float)
+    weights = np.array(weights, dtype = float)
+
+    norms = np.sqrt(np.sum(matrix ** 2, axis=1))
+
+    normalised = matrix / norms[:, np.newaxis]
+
+    weighted = normalised*weights[:, np.newaxis]
+
+    return weighted
 
 #function: ahp
 #param: matrix , Matrix containing critera and criterion
@@ -88,12 +106,10 @@ def consistency_ratio(domEigval, matrix, threshold):
     return CR, is_consistent
 
 ##TEST
-
-
 comparisonMatrix = [
-    [1,3,5],
-    [1/3,1,2],
-    [1/5,1/2,1],
+    [1,9,1/9],
+    [1/9,1,9],
+    [9,1/9,1],
 ]
 
 
