@@ -18,11 +18,11 @@ def normalise_matrix(matrix, weights):
     matrix = np.array(matrix, dtype = float)
     weights = np.array(weights, dtype = float)
 
-    norms = np.sqrt(np.sum(matrix ** 2, axis=1))
+    norms = np.sqrt(np.sum(matrix ** 2, axis=0))
 
-    normalised = matrix / norms[:, np.newaxis]
+    normalised = matrix / norms
 
-    weighted = normalised*weights[:, np.newaxis]
+    weighted = normalised*weights
 
     return weighted
 
