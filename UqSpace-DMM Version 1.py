@@ -139,7 +139,7 @@ def separation_distances(weighted, idealBest, idealWorst):
 
     return dBest, dWorst
 
-def closesness_coefficient(dBest, dWorst):
+def closeness_coefficient(dBest, dWorst):
     total = dBest + dWorst
 
     C = np.divide(dWorst, total, out=np.full_like(total,0.5),where=total != 0)
@@ -168,7 +168,9 @@ def topsis(matrix, weights, benefit):
     C = closeness_coefficient(dBest, dWorst)
 
     ## highest to lowest closeness
-    ranking = np.sort(-C)
+    ranking = np.argsort(-C)
+
+    return C, ranking
     
     
     
@@ -194,6 +196,46 @@ if __name__ == "__main__":
     ## TEST 1:
     print("TEST 1")
     print("Weights:", np.round(weights, 3))
-    print("Dominant eigenvalue:", round(eigenvalue), 3)
+    print("Dominant eigenvalue:", round(eigenvalue, 3))
     print("CR:", round(CR,3), "->", "consistent" if valid else "incon")
+
+    ## TEST 2:
+    specMatrix = [
+        [1, 1/7, 1/9, 1/4, 1/2],
+        [7, 1, 1, 3, 4],
+        [9, 1, 1, 3, 6],
+        [4, 1/3, 1/3, 1, 2],
+        [2, 1/4, 1/6, 1/2, 1],
+    ]
+
+    weights, eigenvalue = ahp(specMatrix)
+    CR, valid = consistency_ratio(eigenvalue, specMatrix, threshold)
+    print("\nTEST 2")
+    
+    print("Weights (%):", np.round(weights *100,1))
+    print("CR:", round(CR, 3), "->", "consistent" if valid else "inconsistent")
+
+    # add solutions to spec table
+    names = ["Design A", "Design B", "Design C"]
+    decisionMatrix = [
+        #deisgn A e.g.
+        #cost|Weight|Perfom|Manufact|Resuse
+        [1200, 4.5, 850, 0.5, 0.3],
+        #design B
+        #cost|Weight|Perfom|Manufact|Resuse
+        [900, 5.2, 780, 0.3, 0.5],
+        #design C
+        #cost|Weight|Perfom|Manufact|Resuse
+        [1500, 3.9, 920, 0.2, 0.2],
+    ]
+
+    #criteria scaling
+    # so like if its cost we obv want it lower so FALSE
+    # but for say performance we probablt want that higher so TRUE
+    benefit = [False, False, True, True, True]
+
+    C, ranking = topsis(decisionMatrix, weights, benefit)
+    print("\nTest 3: TOPSIS")
+    for rank, i in enumerate(ranking,start =1):
+        print(f"{rank}. {names[i]}: C = {C[i]:.3f}")
     
