@@ -123,6 +123,18 @@ def ideal_solutions(weighted, benefit):
 
     return idealBest, idealWorst
 
+#function separation_distances
+#param: weighted
+#param: idealBest
+#param: idealWorst
+def separation_distances(weighted, idealBest, idealWorst):
+    weighted=  np.array(weighted, dtype=float)
+
+    dBest = np.sqrt(np.sum((weighted - idealBest)**2, axis = 1))
+    dWorst = np.sqrt(np.sum((weighted - idealWorst)**2, axis = 1))
+
+    return dBest, dWorst
+
 ##TEST
 comparisonMatrix = [
     [1,9,1/9],
