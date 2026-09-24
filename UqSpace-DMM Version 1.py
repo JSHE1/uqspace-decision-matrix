@@ -105,6 +105,24 @@ def consistency_ratio(domEigval, matrix, threshold):
 
     return CR, is_consistent
 
+
+#function ideal_solutions
+#param: weighted , the weighted and normalised matrix
+#param: benefit , an array of bools where true is btter and false is lower
+#return: idealBest , array (s+)
+#return: idealWorst , array (s-)
+def ideal_solutions(weighted, benefit):
+    weighted = np.array(weighted, dtype = float)
+    benefit = np.array(benefit, dtype = bool)
+
+    colMax = weighted.max(axis=0)
+    colMin = weighted.min(axis=0)
+
+    idealBest = np.where(benefit,colMax,colMin)
+    idealWorst = np.where(benefit,colMin,colMax)
+
+    return idealBest, idealWorst
+
 ##TEST
 comparisonMatrix = [
     [1,9,1/9],
