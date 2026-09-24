@@ -10,21 +10,8 @@ import numpy as np
 #sets default CR = 0, allows for 0 CR to be provided
 threshold = 0
 
-#function: normalise_matrix
-#param: matrix, Matrix containing criteria and criterion
-#param: weights , integer
-#return: weighted, normalised values.
-def normalise_matrix(matrix, weights):
-    matrix = np.array(matrix, dtype = float)
-    weights = np.array(weights, dtype = float)
 
-    norms = np.sqrt(np.sum(matrix ** 2, axis=0))
-
-    normalised = matrix / norms
-
-    weighted = normalised*weights
-
-    return weighted
+################# AHP ##########################################
 
 #function: ahp
 #param: matrix , Matrix containing critera and criterion
@@ -105,6 +92,23 @@ def consistency_ratio(domEigval, matrix, threshold):
 
     return CR, is_consistent
 
+################ TOPSIS ########################################
+
+#function: normalise_matrix
+#param: matrix, Matrix containing criteria and criterion
+#param: weights , integer
+#return: weighted, normalised values.
+def normalise_matrix(matrix, weights):
+    matrix = np.array(matrix, dtype = float)
+    weights = np.array(weights, dtype = float)
+
+    norms = np.sqrt(np.sum(matrix ** 2, axis=0))
+
+    normalised = matrix / norms
+
+    weighted = normalised*weights
+
+    return weighted
 
 #function ideal_solutions
 #param: weighted , the weighted and normalised matrix
@@ -135,27 +139,61 @@ def separation_distances(weighted, idealBest, idealWorst):
 
     return dBest, dWorst
 
+def closesness_coefficient(dBest, dWorst):
+    total = dBest + dWorst
+
+    C = np.divide(dWorst, total, out=np.full_like(total,0.5),where=total != 0)
+
+    return C
+
+def topsis(matrix, weights, benefit):
+    matrix = np.array(matrix, dtype=float)
+    weights = np.array(weights, dtype=float)
+    benefit = np.array(benefit, dtype=float)
+
+    #rough check on invalid params
+    if matrix.ndim != 2:
+        raise ValueError("Error T-01: decision matrix must be 2D")
+    m,n = matrix.shape
+    if len(weights) != n:
+        raise ValueError("Error T-02: number of weights must equal number of criteria")
+    if len(benefit) != n:
+        raise ValueError("Error T-03: number of benefit flags must equal number of criteria")
+    if m < 2:
+        raise ValueError("Error T-04: TOPSIS needs atleast 2 alternatives")
+
+    weighted = normalise_matrix(matrix, weights)
+    idealBest, idealWorst = ideal_solutions(weighted, benefit)
+    dBest, dWorst = separation_distances(weighted, idealBest, idealWorst)
+    C = closeness_coefficient(dBest, dWorst)
+
+    ## highest to lowest closeness
+    ranking = np.sort(-C)
+    
+    
+    
+
+#the big boy topsis!
+
+
 ##TEST
-comparisonMatrix = [
-    [1,9,1/9],
-    [1/9,1,9],
-    [9,1/9,1],
-]
+
+if __name__ == "__main__":
+    
+    comparisonMatrix = [
+        [1,9,1/9],
+        [1/9,1,9],
+        [9,1/9,1],
+    ]
 
 
-weights,eigenvalue = ahp(comparisonMatrix)
+    weights,eigenvalue = ahp(comparisonMatrix)
 
-CR, valid = consistency_ratio(eigenvalue, comparisonMatrix, threshold)
+    CR, valid = consistency_ratio(eigenvalue, comparisonMatrix, threshold)
 
-print("Weights: ")
-print(weights)
-
-print("\nDominant eigenvalue: ")
-print(eigenvalue)
-
-if valid:
-    print("Matrix is consistent")
-else:
-    print("Matrix is inconsistent")
-
-
+    ## TEST 1:
+    print("TEST 1")
+    print("Weights:", np.round(weights, 3))
+    print("Dominant eigenvalue:", round(eigenvalue), 3)
+    print("CR:", round(CR,3), "->", "consistent" if valid else "incon")
+    
