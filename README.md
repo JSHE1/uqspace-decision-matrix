@@ -13,5 +13,5 @@ judge criterion off of their associated criteria easier.
 - [x] AHP consistency validation
 - [X] TOPSIS implementation
 - [X] Testing of TOPSIS and AHP
-- [ ] Interfacing
-- [ ] Results visualisation (a part of interfacting)
+- [X] Interfacing
+- [X] Results visualisation (a part of interfacting)
